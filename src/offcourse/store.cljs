@@ -5,7 +5,7 @@
             [offcourse.models.resource :as resource]))
 
 
-(def app-state (atom {:resources @resource/resources}))
+(def app-state (atom {:resources {}}))
 
 (defn update-resources [resources]
   (swap! app-state #(assoc %1 :resources resources)))

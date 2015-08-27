@@ -11,7 +11,9 @@
                   [:td url]
                   [:td title]
                   [:td instructions]
-                  [:td (str review)]]))
+                  [:td
+                   (for [[criterium rating] review]
+                     ^{:key criterium} [:p (str (name criterium) " " rating)])]]))
 
 (defn resources-list []
   [:table
