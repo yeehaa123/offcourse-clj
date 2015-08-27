@@ -4,16 +4,22 @@
 
 (enable-console-print!)
 
-(defn resource-item [val]
-  (let [url (val :url)
-        data (val :data)
-        color (if data "red" "black")]
-    [:li {:style {:color color}} url]))
+(defn resource-item [uuid val]
+  (let [{:keys [url title instructions review]} val
+        color (if title "black" "red")]
+    ^{:key uuid} [:tr {:style {:color color}}
+                  [:td url]
+                  [:td title]
+                  [:td instructions]
+                  [:td (str review)]]))
 
 (defn resources-list []
-  [:ul
-   (for [[uuid val] (:resources @app-state)]
-     ^{:key uuid} [resource-item val])])
+  [:table
+   [:tr
+    (for [header-title ["url" "title" "instructions" "review"]]
+      ^{:key header-title} [:th header-title])]
+   (for [[uuid val] (@app-state :resources)]
+     (resource-item uuid val))])
 
 (defn app []
   [:h1 "Offcourse_"

@@ -8,6 +8,7 @@
                  [org.clojure/clojurescript "0.0-3297"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [com.lucasbradstreet/cljs-uuid-utils "1.0.2"]
+                 [env/faker "0.4.0"]
                  [reagent "0.5.0"]]
 
   :plugins [[lein-cljsbuild "1.0.5"]

@@ -2,25 +2,22 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as reagent :refer [atom]]
             [cljs-uuid-utils.core :refer [make-random-squuid uuid-string]]
+            [faker.lorem :as lorem]
+            [clojure.string :as string]
+            [offcourse.models.resource-helpers :as helpers]
             [cljs.core.async :refer [timeout close! chan >! <!]]))
 
 (def channel (chan 10))
 (defonce resources (atom {}))
-
-(def seed-urls ["www.google.com"
-                "www.yahoo.com"
-                "www.bing.com"
-                "www.altavista.com"])
-
-(defn generate-uuid []
-  (uuid-string (make-random-squuid)))
 
 (defn create [uuid url]
   [(keyword uuid) {:url url}])
 
 (defn add-data [uuid url]
   [(keyword uuid) {:url url
-                   :data "bla bla"}])
+                   :title (helpers/generate-title)
+                   :instructions ""
+                   :review (helpers/generate-review)}])
 
 (defn -add-url [uuid url resources]
   (let [[key val] (create uuid url)]
@@ -39,7 +36,7 @@
 
 (defn add [url]
   (go
-    (let [uuid (generate-uuid)]
+    (let [uuid (helpers/generate-uuid)]
       (>! channel (swap! resources #(-add-url uuid url %1)))
       (<! (timeout (+ 1000 (rand-int 2000))))
       (fetch-data uuid url))))
@@ -49,14 +46,8 @@
    (>! channel (swap! resources #(-delete uuid %1)))))
 
 (defn seed []
-  (for [url seed-urls] (add url)))
-
-(defn -delete-all [resources]
-  (if (empty? resources)
-    resources
-    (let [[uuid _] (first resources)]
-      (recur (-delete uuid resources)))))
+  (for [url helpers/seed-urls] (add url)))
 
 (defn delete-all []
   (go
-    (>! channel (swap! resources #(-delete-all %1)))))
+    (>! channel (reset! resources {}))))
