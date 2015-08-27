@@ -1,49 +1,62 @@
 (ns offcourse.models.resource
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as reagent :refer [atom]]
+            [cljs-uuid-utils.core :refer [make-random-squuid uuid-string]]
             [cljs.core.async :refer [timeout close! chan >! <!]]))
 
-(def channel (chan 1))
+(def channel (chan 10))
+(defonce resources (atom {}))
 
 (def seed-urls ["www.google.com"
                 "www.yahoo.com"
                 "www.bing.com"
                 "www.altavista.com"])
 
-(defn create [url]
-  [(keyword url) {:url url}])
+(defn generate-uuid []
+  (uuid-string (make-random-squuid)))
 
-(defn add-data [url]
-  [(keyword url) {:url url
-                  :data "bla bla"}])
+(defn create [uuid url]
+  [(keyword uuid) {:url url}])
 
-(def seed-resources
-  (let [tuples (map #(create %1) seed-urls)]
-    (into {} tuples)))
+(defn add-data [uuid url]
+  [(keyword uuid) {:url url
+                   :data "bla bla"}])
 
-(defonce resources (atom seed-resources))
-
-(defn -add-url [url resources]
-  (let [[key val] (create url)]
+(defn -add-url [uuid url resources]
+  (let [[key val] (create uuid url)]
     (assoc resources key val)))
 
-(defn -add-data [url resources]
-  (let [[key val] (add-data url)]
+(defn -add-data [uuid url resources]
+  (let [[key val] (add-data uuid url)]
     (assoc resources key val)))
 
-(defn -delete [url resources]
-  (dissoc resources (keyword url)))
+(defn -delete [uuid resources]
+  (dissoc resources uuid))
 
-(defn fetch-data [url]
+(defn fetch-data [uuid url]
   (go
-    (<! (timeout 3000))
-    (>! channel (swap! resources #(-add-data url %1)))))
+    (>! channel (swap! resources #(-add-data uuid url %1)))))
 
 (defn add [url]
   (go
-    (>! channel (swap! resources #(-add-url url %1)))
-    (fetch-data url)))
+    (let [uuid (generate-uuid)]
+      (>! channel (swap! resources #(-add-url uuid url %1)))
+      (<! (timeout (+ 1000 (rand-int 2000))))
+      (fetch-data uuid url))))
 
-(defn delete [url]
+(defn delete [uuid]
   (go
-   (>! channel (swap! resources #(-delete url %1)))))
+   (>! channel (swap! resources #(-delete uuid %1)))))
+
+(defn seed []
+  (for [url seed-urls] (add url)))
+
+(defn -delete-all [resources]
+  (if (empty? resources)
+    resources
+    (let [[uuid _] (first resources)]
+      (recur (-delete uuid resources)))))
+
+(defn delete-all []
+  (go
+    (>! channel (swap! resources #(-delete-all %1)))))

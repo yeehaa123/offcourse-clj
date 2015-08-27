@@ -4,20 +4,25 @@
             [cljs.core.async :refer [<!]]
             [offcourse.models.resource :as resource]))
 
-(defonce app-state (atom {:resources @resource/resources}))
 
-(defn update-resources []
+(def app-state (atom {:resources @resource/resources}))
+
+(defn update-resources [resources]
+  (swap! app-state #(assoc %1 :resources resources)))
+
+(defn listen-for-updates []
   (go
     (loop []
       (let [resources (<! resource/channel)]
-        (println resources)
-        (swap! app-state #(assoc %1 :resources resources))
+        (update-resources resources)
         (recur)))))
 
 (defn add-resource [url]
   (resource/add url))
 
-(defn delete-resource [url]
-  (resource/delete url))
+(defn delete-resource [uuid]
+  (resource/delete uuid))
 
-(update-resources)
+(listen-for-updates)
+
+(resource/seed)

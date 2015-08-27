@@ -4,21 +4,16 @@
 
 (enable-console-print!)
 
-(println "Edits to this text should show up in your developer console.")
-
 (defn resource-item [val]
-  (println val)
   (let [url (val :url)
-        data (val :data)]
-    [:li (if data
-           data
-           url)]))
+        data (val :data)
+        color (if data "red" "black")]
+    [:li {:style {:color color}} url]))
 
 (defn resources-list []
   [:ul
-   (for [[_ val] (:resources @app-state)]
-     (let [url (val :url)]
-       ^{:key url} [resource-item val]))])
+   (for [[uuid val] (:resources @app-state)]
+     ^{:key uuid} [resource-item val])])
 
 (defn app []
   [:h1 "Offcourse_"
