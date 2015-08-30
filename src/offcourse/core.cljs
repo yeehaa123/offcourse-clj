@@ -5,6 +5,9 @@
 
 (enable-console-print!)
 
+(defn renderMarkdown [markdown]
+  {:dangerously-set-innerHTML {:__html (md->html markdown)}})
+
 (defn checkpoint-item [uuid val]
   (let [{:keys [url task instructions review]} val
         color (if review "black" "red")]
@@ -12,8 +15,7 @@
                   [:td [:input { :type "checkbox" :default-checked true}]]
                   [:td task]
                   [:td url]
-                  [:td
-                   {:dangerously-set-innerHTML {:__html (md->html instructions)}}]
+                  [:td (renderMarkdown instructions)]
                   [:td
                    (for [[criterium rating] review]
                      ^{:key criterium} [:p (str (name criterium) " " rating)])]]))
