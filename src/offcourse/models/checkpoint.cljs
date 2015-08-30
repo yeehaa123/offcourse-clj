@@ -1,4 +1,4 @@
-(ns offcourse.models.resource
+(ns offcourse.models.checkpoint
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as reagent :refer [atom]]
             [cljs-uuid-utils.core :refer [make-random-squuid uuid-string]]
@@ -15,8 +15,8 @@
 
 (defn add-data [uuid url]
   [(keyword uuid) {:url url
-                   :title (helpers/generate-title)
-                   :instructions ""
+                   :task (helpers/generate-task)
+                   :instructions (helpers/generate-instructions)
                    :review (helpers/generate-review)}])
 
 (defn -add-url [uuid url resources]

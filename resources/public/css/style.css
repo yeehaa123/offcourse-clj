@@ -1,2 +1,15 @@
 /* some style */
+* {
+    font-family: Helvetica;
+    font-size: 11px;
+}
 
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  padding: 0.25rem;
+  text-align: left;
+  border: 1px solid #ccc;
+}

@@ -11,10 +11,16 @@
                 "www.bing.com"
                 "www.altavista.com"])
 
-(defn generate-title []
-  (let [num (+ (rand-int 5) 3)
+(defn generate-task []
+  (let [num (+ (rand-int 2) 3)
         words (take num (lorem/words))]
     (string/join " " words)))
+
+(defn generate-instructions []
+  (let [num (+ (rand-int 3) 0)
+        paragraphs (take num (lorem/paragraphs))]
+    (if (> num 0)
+      (string/join "\n\n" paragraphs))))
 
 (defn generate-review []
   (let [criteria [:clarity :pertinence :timeliness :difficulty :entertainment]

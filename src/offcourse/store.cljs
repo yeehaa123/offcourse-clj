@@ -2,27 +2,27 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as reagent :refer [atom]]
             [cljs.core.async :refer [<!]]
-            [offcourse.models.resource :as resource]))
+            [offcourse.models.checkpoint :as checkpoint]))
 
 
-(def app-state (atom {:resources {}}))
+(def app-state (atom {}))
 
-(defn update-resources [resources]
-  (swap! app-state #(assoc %1 :resources resources)))
+(defn update-checkpoints [checkpoints]
+  (swap! app-state #(assoc %1 :checkpoints checkpoints)))
 
 (defn listen-for-updates []
   (go
     (loop []
-      (let [resources (<! resource/channel)]
-        (update-resources resources)
+      (let [checkpoints (<! checkpoint/channel)]
+        (update-checkpoints checkpoints)
         (recur)))))
 
-(defn add-resource [url]
-  (resource/add url))
+(defn add-checkpoint [url]
+  (checkpoint/add url))
 
-(defn delete-resource [uuid]
-  (resource/delete uuid))
+(defn delete-checkpoint [uuid]
+  (checkpoint/delete uuid))
 
 (listen-for-updates)
 
-(resource/seed)
+(checkpoint/seed)
