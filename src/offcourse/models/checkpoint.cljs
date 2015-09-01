@@ -14,7 +14,8 @@
   [(keyword uuid) {:url url}])
 
 (defn add-data [uuid url]
-  [(keyword uuid) {:url url
+  [(keyword uuid) {:done true
+                   :url url
                    :task (helpers/generate-task)
                    :instructions (helpers/generate-instructions)
                    :review (helpers/generate-review)}])
