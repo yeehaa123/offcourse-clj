@@ -4,7 +4,6 @@
             [cljs.core.async :refer [<!]]
             [offcourse.models.checkpoint :as checkpoint]))
 
-
 (def app-state (atom {}))
 
 (defn update-checkpoints [checkpoints]
@@ -17,12 +16,5 @@
         (update-checkpoints checkpoints)
         (recur)))))
 
-(defn add-checkpoint [url]
-  (checkpoint/add url))
-
-(defn delete-checkpoint [uuid]
-  (checkpoint/delete uuid))
-
 (listen-for-updates)
 
-(checkpoint/seed)
