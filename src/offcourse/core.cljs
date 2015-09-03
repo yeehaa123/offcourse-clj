@@ -2,7 +2,8 @@
     (:require [reagent.core :refer [render-component]]
               [offcourse.store :refer [app-state]]
               [offcourse.views.containers.app :refer [app]]
-              [offcourse.actions.view-model :refer [add-checkpoint delete-checkpoint seed-checkpoints]]))
+              [offcourse.actions.view-model :as actions]))
+
 
 (enable-console-print!)
 

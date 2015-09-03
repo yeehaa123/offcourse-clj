@@ -31,7 +31,10 @@
 (defn -delete [uuid resources]
   (dissoc resources uuid))
 
-(defn fetch-data [uuid url]
+(defn -mark-as-done [uuid]
+  (update-in @resources [uuid :done] #(not %1)))
+
+(defn -fetch-data [uuid url]
   (go
     (>! channel (swap! resources #(-add-data uuid url %1)))))
 
@@ -40,7 +43,7 @@
     (let [uuid (helpers/generate-uuid)]
       (>! channel (swap! resources #(-add-url uuid url %1)))
       (<! (timeout (+ 1000 (rand-int 2000))))
-      (fetch-data uuid url))))
+      (-fetch-data uuid url))))
 
 (defn delete [uuid]
   (go
@@ -52,3 +55,7 @@
 (defn delete-all []
   (go
     (>! channel (reset! resources {}))))
+
+(defn mark-as-done [uuid]
+  (go
+    (>! channel (swap! resources #(-mark-as-done uuid)))))
