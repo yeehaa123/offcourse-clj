@@ -13,5 +13,8 @@
    (for [header-title (extract-titles object)]
      ^{:key header-title} [:th (name header-title)])])
 
-(defn renderMarkdown [markdown-string]
+(defn render-markdown [markdown-string]
   {:dangerously-set-innerHTML {:__html (md->html markdown-string)}})
+
+(defn checkbox [val handle-done]
+  [:input {:type "checkbox" :default-checked val :on-click #(handle-done)}])

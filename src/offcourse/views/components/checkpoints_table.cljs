@@ -1,26 +1,24 @@
 (ns offcourse.views.components.checkpoints-table
-  (:require [offcourse.views.helpers :refer [renderMarkdown table-headers]]
-            [offcourse.actions.view-model :as actions]))
+  (:require [offcourse.views.helpers :as helpers]))
 
 (defn review-list [review]
   (for [[criterium rating] review]
     ^{:key criterium} [:p (str (name criterium) " " rating)]))
 
-(defn checkpoint-field [[uuid [key val]]]
+(defn checkpoint-field [[key val] handle-done]
   (case key
-    :done ^{:key key} [:td [:input {:type "checkbox" :default-checked val
-                                    :on-click #(actions/handle-done uuid)}]]
-    :instructions ^{:key key} [:td (renderMarkdown val)]
+    :done ^{:key key} [:td (helpers/checkbox  val handle-done)]
+    :instructions ^{:key key} [:td (helpers/render-markdown val)]
     :review ^{:key key} [:td (review-list val)]
     ^{:key key} [:td val]))
 
-(defn checkpoint-item [[uuid val]]
+(defn checkpoint-item [[uuid val] handle-done]
   ^{:key uuid} [:tr
                 (for [field (into {} val)]
-                  (checkpoint-field [uuid field]))])
+                  (checkpoint-field field (partial handle-done uuid)))])
 
-(defn checkpoints-table [checkpoints]
+(defn checkpoints-table [checkpoints handle-done]
   [:table
-   (table-headers checkpoints)
+   (helpers/table-headers checkpoints)
    (for [checkpoint checkpoints]
-     (checkpoint-item checkpoint))])
+     (checkpoint-item checkpoint handle-done))])

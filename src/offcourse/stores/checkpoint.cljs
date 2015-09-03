@@ -2,34 +2,35 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as reagent :refer [atom]]
             [offcourse.models.resource-helpers :as helpers]
-            [offcourse.models.checkpoint :as model]
+            [offcourse.models.checkpoint :as checkpoint]
             [cljs.core.async :refer [timeout close! chan >! <!]]))
 
 (def channel (chan 10))
-(defonce resources (atom {}))
+(defonce checkpoints (atom {}))
 
-(defn -fetch-data [uuid url]
+(defn listen-for-updates []
   (go
-    (>! channel (swap! resources #(model/add-data uuid url %1)))))
+    (loop []
+      (let [{:keys [id] :as instance } (<! checkpoint/channel)]
+        (println instance)
+        (>! channel (swap! checkpoints #(assoc %1 id instance)))
+        (recur)))))
 
 (defn add [url]
-  (go
-    (let [uuid (helpers/generate-uuid)]
-      (>! channel (swap! resources #(model/add-url uuid url %1)))
-      (<! (timeout (+ 1000 (rand-int 2000))))
-      (-fetch-data uuid url))))
-
-(defn delete [uuid]
-  (go
-   (>! channel (swap! resources #(model/delete uuid %1)))))
+    (checkpoint/add url))
 
 (defn seed []
   (for [url helpers/seed-urls] (add url)))
 
+(defn delete [uuid]
+  (go
+    (>! channel (swap! checkpoints #(dissoc %1 uuid)))))
+
 (defn delete-all []
   (go
-    (>! channel (reset! resources {}))))
+    (>! channel (reset! checkpoints {}))))
 
 (defn mark-as-done [uuid]
-  (go
-    (>! channel (swap! resources #(model/mark-as-done %1 uuid)))))
+    (checkpoint/mark-as-done (@checkpoints uuid)))
+
+(listen-for-updates)
