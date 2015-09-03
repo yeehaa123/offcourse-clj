@@ -1,5 +1,5 @@
 (ns offcourse.actions.view-model
-  (:require [offcourse.models.checkpoint :as checkpoint]))
+  (:require [offcourse.stores.checkpoint :as checkpoint]))
 
 (defn add-checkpoint [url]
   (checkpoint/add url))

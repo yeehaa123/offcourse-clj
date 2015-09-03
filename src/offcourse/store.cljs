@@ -2,7 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as reagent :refer [atom]]
             [cljs.core.async :refer [<!]]
-            [offcourse.models.checkpoint :as checkpoint]))
+            [offcourse.stores.checkpoint :as checkpoint]))
 
 (def app-state (atom {}))
 
