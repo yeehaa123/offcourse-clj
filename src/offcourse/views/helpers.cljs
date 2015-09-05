@@ -1,5 +1,6 @@
 (ns offcourse.views.helpers
-  (:require [markdown.core :refer [md->html]]))
+  (:require [clojure.string :refer [blank?]]
+            [markdown.core :refer [md->html]]))
 
 (defn extract-titles [object]
   (->> object
@@ -7,6 +8,9 @@
        rest
        (into {})
        keys))
+
+(defn valid? [val]
+  (not (blank? val)))
 
 (defn table-headers [object]
   [:tr

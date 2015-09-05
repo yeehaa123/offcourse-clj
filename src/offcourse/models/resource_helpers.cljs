@@ -11,8 +11,9 @@
                 "www.bing.com"
                 "www.altavista.com"])
 
-(defn generate-task []
-  (let [num (+ (rand-int 2) 3)
+(defn generate-string [min max]
+  (let [diff (- max min)
+        num (+ (rand-int min) diff)
         words (take num (lorem/words))]
     (string/join " " words)))
 

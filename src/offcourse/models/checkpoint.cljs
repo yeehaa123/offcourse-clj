@@ -6,21 +6,22 @@
 
 (def channel (chan 10))
 
-(defn create [uuid url]
+(defn create [url]
   (let [uuid (helpers/generate-uuid)]
-    {:id uuid :url url}))
-
-(defn -generate-data [{:keys [id url]}]
-    {:id id
-     :done true
-     :url url
-     :task (helpers/generate-task)
+    {:id uuid
+     :done false
+     :task (helpers/generate-string 2 5)
      :instructions (helpers/generate-instructions)
-     :review (helpers/generate-review)})
+     :url url}))
+
+(defn -generate-data [checkpoint]
+  (assoc checkpoint
+         :title (helpers/generate-string 2 8)
+         :review (helpers/generate-review)))
 
 (defn add [url]
   (go
-    (let [checkpoint (create uuid url)]
+    (let [checkpoint (create  url)]
       (>! channel checkpoint)
       (<! (timeout (rand-int 3000)))
       (>! channel (-generate-data checkpoint)))))
@@ -28,4 +29,3 @@
 (defn mark-as-done [resource]
   (go
     (>! channel (update-in resource [:done] #(not %1)))))
-

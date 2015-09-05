@@ -4,7 +4,6 @@
               [offcourse.views.containers.app :refer [app]]
               [offcourse.actions.view-model :as actions]))
 
-
 (enable-console-print!)
 
 (render-component [app]
